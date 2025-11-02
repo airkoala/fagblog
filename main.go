@@ -29,6 +29,7 @@ func main() {
 	context := fagblog.Context{
 		SiteMetadata: blogMetadata,
 		Templates:    loadTemplates(config.TemplateDir),
+		PostCache:    fagblog.NewPostCache(),
 	}
 
 	handle(mux, route.Home(&context, &config))

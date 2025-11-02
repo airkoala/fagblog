@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"path/filepath"
 	"slices"
 	"time"
 
@@ -33,9 +34,19 @@ type BlogPost struct {
 }
 
 // Parses a TOML file and returns a BlogPost struct.
-func GetPost(dirPath string, postName string) (BlogPost, error) {
+// Uses cache if available to avoid repeated file I/O.
+func GetPost(dirPath string, postName string, cache *PostCache) (BlogPost, error) {
+	cacheKey := filepath.Join(dirPath, postName)
+	
+	// Check cache first
+	if cache != nil {
+		if post, ok := cache.GetPost(cacheKey); ok {
+			return post, nil
+		}
+	}
+	
 	post := BlogPost{}
-	postDirPath := dirPath + "/" + postName
+	postDirPath := filepath.Join(dirPath, postName)
 
 	// Check if the post directory exists
 	// If it doesn't exist, return os.ErrNotExist
@@ -44,7 +55,7 @@ func GetPost(dirPath string, postName string) (BlogPost, error) {
 		return post, err
 	}
 
-	metadata, err := GetPostMetadata(dirPath, postName)
+	metadata, err := GetPostMetadata(dirPath, postName, cache)
 	if err != nil {
 		return post, err
 	}
@@ -56,9 +67,9 @@ func GetPost(dirPath string, postName string) (BlogPost, error) {
 	// 	log.Printf("Error reading file %s: %v", postDirPath+"/index.html", err)
 	// }
 
-	content, headings, err := getPostContentAndHeadings(postDirPath + "/index.html")
+	content, headings, err := getPostContentAndHeadings(filepath.Join(postDirPath, "index.html"))
 	if err != nil {
-		log.Printf("Error reading file %s: %v", postDirPath+"/index.html", err)
+		log.Printf("Error reading file %s: %v", filepath.Join(postDirPath, "index.html"), err)
 		return post, err
 	}
 
@@ -70,12 +81,26 @@ func GetPost(dirPath string, postName string) (BlogPost, error) {
 	// 	log.Printf("Heading: %s, Level: %d, Id: %s", h.Title, h.Level, h.Id)
 	// }
 
+	// Store in cache
+	if cache != nil {
+		cache.SetPost(cacheKey, post)
+	}
+
 	return post, nil
 }
 
-func GetPostMetadata(dirPath string, postName string) (BlogPostMetadata, error) {
+func GetPostMetadata(dirPath string, postName string, cache *PostCache) (BlogPostMetadata, error) {
+	cacheKey := filepath.Join(dirPath, postName)
+	
+	// Check cache first
+	if cache != nil {
+		if metadata, ok := cache.GetMetadata(cacheKey); ok {
+			return metadata, nil
+		}
+	}
+	
 	metadata := BlogPostMetadata{}
-	postDirPath := dirPath + "/" + postName
+	postDirPath := filepath.Join(dirPath, postName)
 
 	// Check if the post directory exists
 	// If it doesn't exist, return os.ErrNotExist
@@ -84,11 +109,16 @@ func GetPostMetadata(dirPath string, postName string) (BlogPostMetadata, error) 
 		return metadata, err
 	}
 
-	_, err := toml.DecodeFile(postDirPath+"/meta.toml", &metadata)
+	_, err := toml.DecodeFile(filepath.Join(postDirPath, "meta.toml"), &metadata)
 
 	if err != nil {
 		log.Printf("Error decoding TOML file: %v", err)
 		return metadata, err
+	}
+
+	// Store in cache
+	if cache != nil {
+		cache.SetMetadata(cacheKey, metadata)
 	}
 
 	return metadata, nil
@@ -223,7 +253,7 @@ func normaliseHeadings(headings []Heading) {
 	slices.Sort(levels)
 
 	// Set heading levels to normalised values.
-	for _, h := range headings {
-		h.Level = uint(slices.Index(levels, h.Level))
+	for i := range headings {
+		headings[i].Level = uint(slices.Index(levels, headings[i].Level))
 	}
 }

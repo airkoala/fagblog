@@ -21,7 +21,7 @@ func BlogPost(context *fagblog.Context, config *fagblog.Config) Route {
 		Pattern: "GET /blog/{postName}",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
 			postName := r.PathValue("postName")
-			post, err := fagblog.GetPost(config.ContentDir+"/blog", postName)
+			post, err := fagblog.GetPost(config.ContentDir+"/blog", postName, context.PostCache)
 
 			if err != nil {
 				if errors.Is(err, os.ErrNotExist) {

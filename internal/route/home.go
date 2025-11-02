@@ -31,7 +31,7 @@ func Home(context *fagblog.Context, config *fagblog.Config) Route {
 			}
 
 			for _, n := range postNames {
-				metadata, err := fagblog.GetPostMetadata(config.ContentDir+"/blog", n)
+				metadata, err := fagblog.GetPostMetadata(config.ContentDir+"/blog", n, context.PostCache)
 				if err != nil {
 					log.Printf("Error getting post metadata: %v\n", err)
 					http.Error(w, err.Error(), http.StatusInternalServerError)
