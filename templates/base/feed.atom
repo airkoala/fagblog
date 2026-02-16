@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>{{ .Context.SiteMetadata.Title }}</title>
+	<id>https://{{ .Context.SiteMetadata.Hostname }}</id>
+	<link rel="alternate" href="https://{{ .Context.SiteMetadata.Hostname }}"/>
+	<link rel="self" href="https://{{ .Context.SiteMetadata.Hostname }}{{ .Url }}"/>
+	<author>
+		<name>{{ .Context.SiteMetadata.Author.Name }}</name>
+	</author>
+	{{ $hostname := .Context.SiteMetadata.Hostname }}
+	{{ range $id, $post := .Posts }}
+	<entry>
+		<title>{{ $post.Metadata.Title }}</title>
+		<link rel="alternate" type="text/html" href="https://{{ $hostname }}/blog/{{ $id }}"/>
+		<id>{{ $id }}</id>
+		<published>{{ $post.Metadata.Timestamp.Format "2006-01-02T15:04:05Z07:00" }}</published>
+		<summary>{{ $post.Metadata.Summary}}</summary>
+		<content type="html"><![CDATA[{{ $post.Content }}]]></content>
+	</entry>
+	{{ end }}
+</feed>

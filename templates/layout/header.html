@@ -2,6 +2,7 @@
     <a href="/" class="header-title">{{ .Context.SiteMetadata.Title }}</a>
     <nav class="header-nav">
         <ul class="nav-list">
+            <li><a href="/feed.atom"><i class="fa-solid fa-rss"></i> Feed</a></li>
             <li><a href="/">Home</a></li>
 
             {{ range $e := .Context.SiteMetadata.HeaderLinks }}
