@@ -3,7 +3,7 @@ package fagblog
 import (
 	"bytes"
 	"errors"
-	"html/template"
+	"text/template"
 	"log"
 	"os"
 	"slices"
@@ -28,7 +28,7 @@ type BlogPostMetadata struct {
 
 type BlogPost struct {
 	Metadata BlogPostMetadata
-	Content  template.HTML
+	Content  string
 	Headings []Heading
 }
 
@@ -62,7 +62,7 @@ func GetPost(dirPath string, postName string) (BlogPost, error) {
 		return post, err
 	}
 
-	post.Content = template.HTML(content)
+	post.Content = content
 	post.Headings = headings
 
 	// // Debug

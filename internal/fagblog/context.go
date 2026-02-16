@@ -1,6 +1,6 @@
 package fagblog
 
-import "html/template"
+import "text/template"
 
 type Context struct {
 	SiteMetadata SiteMetadata
