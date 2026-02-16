@@ -18,19 +18,19 @@
 
 <section class="blog-posts">
     <h1>Posts</h1>
-    {{ range $name, $meta := .Posts }}
-    <a href="/blog/{{$name}}" style="text-decoration: none">
+    {{ range $i, $p := .Posts }}
+    <a href="/blog/{{.Id}}" style="text-decoration: none">
         <article class="post">
-            {{ if $meta.ThumbnailHref }}
-            <img class="post-thumbnail" src="{{ $meta.ThumbnailHref }}" />
+            {{ if .Metadata.ThumbnailHref }}
+            <img class="post-thumbnail" src="{{ .Metadata.ThumbnailHref }}" />
             {{ end }}
             <div class="post-details">
-                <h3 class="post-title">{{ $meta.Title }}</h3>
+                <h3 class="post-title">{{ .Metadata.Title }}</h3>
                 <div class="post-meta">
-                    <time datetime="{{ $meta.Timestamp.UTC }}" class="local-time"></time>.
-                    {{ if $meta.Summary }}
+                    <time datetime="{{ .Metadata.Timestamp.UTC }}" class="local-time"></time>.
+                    {{ if .Metadata.Summary }}
                     <br>
-                    {{ $meta.Summary }}
+                    {{ .Metadata.Summary }}
                     {{ end }}
                 </div>
             </div>

@@ -1,15 +1,20 @@
 package route
 
 import (
-	"github.com/airkoala/fagblog/internal/fagblog"
 	"log"
 	"net/http"
+
+	"github.com/airkoala/fagblog/internal/fagblog"
 )
 
-type HomeData struct {
+type post struct {
+		Id      string
+		Metadata fagblog.BlogPostMetadata
+	}
+type homeData struct {
 	Context *fagblog.Context
-	Posts   map[string]fagblog.BlogPostMetadata
-	Url     string
+	Posts   []post 
+	Url string
 }
 
 func Home(context *fagblog.Context, config *fagblog.Config) Route {
@@ -24,10 +29,10 @@ func Home(context *fagblog.Context, config *fagblog.Config) Route {
 				return
 			}
 
-			homeData := HomeData{
+			homeData := homeData{
 				Context: context,
-				Posts:   make(map[string]fagblog.BlogPostMetadata, len(postNames)),
-				Url:     r.URL.String(),
+				Posts: make([]post, 0, len(postNames)),
+				Url: r.URL.String(),
 			}
 
 			for _, n := range postNames {
@@ -37,7 +42,10 @@ func Home(context *fagblog.Context, config *fagblog.Config) Route {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-				homeData.Posts[n] = metadata
+				homeData.Posts = append(homeData.Posts, post{
+					Id: n,
+					Metadata: metadata,
+				})
 			}
 
 			err = context.Templates["home.html"].Execute(w, homeData)

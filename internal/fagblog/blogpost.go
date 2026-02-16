@@ -112,6 +112,9 @@ func GetPosts(dirPath string) ([]string, error) {
 		return posts, err
 	}
 
+	// to ensure that posts are in order of newest to oldest
+	slices.Reverse(entries)
+
 	for _, entry := range entries {
 		if entry.IsDir() {
 			posts = append(posts, entry.Name())
