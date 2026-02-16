@@ -24,6 +24,7 @@ type BlogPostMetadata struct {
 	Timestamp     time.Time
 	Summary       string
 	ThumbnailHref string
+	Urn		      string
 }
 
 type BlogPost struct {
